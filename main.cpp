@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
 #include "tokenization.h"
 
 int main(int argc, char* argv[]) {
