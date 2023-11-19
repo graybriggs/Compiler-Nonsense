@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include "debug.h"
 #include "tokenization.h"
 
 int main(int argc, char* argv[]) {
@@ -26,8 +27,10 @@ int main(int argc, char* argv[]) {
   }
 
   Tokenizer tokenizer(std::move(contents));
-  tokenizer.tokenize();
+  std::vector<Token> tok = tokenizer.tokenize();
   
+  dbg_tokens(tok);
+
   //std::cout << contents << "\n";
   return 0;
 }

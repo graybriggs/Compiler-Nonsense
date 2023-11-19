@@ -2,57 +2,71 @@
 #include <cctype>
 #include <iostream>
 
+#include "token.h"
 #include "tokenization.h"
+
+
+#define DBG_PRINT(msg) std::cout << msg << "\n"; 
 
 Tokenizer::Tokenizer(std::string str):
     m_src(std::move(str))
     {}
 
-
 std::vector<Token> Tokenizer::tokenize() {
 
-    std::vector<Token> tokens;
-    std::string buf;
-
-    while (peek().has_value()) {
-      if (std::isalpha(peek().value())) {
+  std::vector<Token> tokens;
+  std::string buf;
+  int val = 0;
+  while (peek().has_value()) {
+    if (std::isalpha(peek().value()) || peek().value() == ' ' || peek().value() == ';') {
+      buf.push_back(consume());
+      while (peek().has_value() && std::isalnum(peek().value())) {
         buf.push_back(consume());
-        while (peek().has_value() && std::isalnum(peek().value())) {
-          buf.push_back(consume());
-        }
+      }
 
-        if (buf == "exit") {
-          std::cout << "got exit" << std::endl;
-          tokens.push_back({ .type = TokenType::tt_exit, .value = buf });
-          buf.clear();        }
-        else if (buf == "return") {
-          std::cout << "got return" << std::endl;
-          tokens.push_back({ .type = TokenType::tt_return, .value = buf });
-        }
-        else if (buf == ";") {
-          std::cout << "got semicolon\n" << std::endl;
-          tokens.push_back({ .type = TokenType::tt_semi, .value = buf });
-        }
-        if (std::isspace(peek().has_value())) {
-          std::cout << "got space\n";
-        }
+      if (buf == "exit") {
+        DBG_PRINT("got exit")
+        tokens.push_back({ .type = TokenType::tt_exit, .value = buf });
         buf.clear();
+        continue;
       }
-      else if (std::isdigit(peek().value())) {
-        buf.push_back(consume());
-        while (peek().has_value() && std::isdigit(peek().value())) {
-          buf.push_back(consume());
-        }
-        tokens.push_back({ .type = TokenType::tt_int, .value = buf});
-        std::cout << "Got Int: " << buf << std::endl;
+      else if (buf == "return") {
+        DBG_PRINT("got return")
+        tokens.push_back({ .type = TokenType::tt_return, .value = buf });
         buf.clear();
+        continue;
       }
+      else if (buf == ";") {
+        DBG_PRINT("got semi")
+        tokens.push_back({ .type = TokenType::tt_semi, .value = buf });
+        buf.clear();
+        continue;
+      }
+      else if (std::isspace(peek().has_value())) {
+        DBG_PRINT("got space")
+        consume();
+        buf.clear();
+        continue;
+      }
+      buf.clear();
     }
-
-    return tokens;
+    else if (std::isdigit(peek().value())) {
+      buf.push_back(consume());
+      while (peek().has_value() && std::isdigit(peek().value())) {
+        buf.push_back(consume());
+      }
+      tokens.push_back({ .type = TokenType::tt_int, .value = buf});
+      std::cout << "Got Int: " << buf << std::endl;
+      buf.clear();
+      continue;
+    }
   }
+  return tokens;
+}
+
+
 std::optional<char> Tokenizer::peek(int ahead) const {
-  if (m_index + ahead >= m_src.length()) {
+  if (m_index + ahead > m_src.length()) {
     return {};
   }
   else {
