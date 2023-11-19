@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cctype>
 #include <iostream>
 
 #include "tokenization.h"
@@ -19,31 +20,32 @@ std::vector<Token> Tokenizer::tokenize() {
         while (peek().has_value() && std::isalnum(peek().value())) {
           buf.push_back(consume());
         }
-        
+
         if (buf == "exit") {
           std::cout << "got exit" << std::endl;
           tokens.push_back({ .type = TokenType::tt_exit, .value = buf });
-          buf.clear();
-          continue;
-        }
+          buf.clear();        }
         else if (buf == "return") {
           std::cout << "got return" << std::endl;
           tokens.push_back({ .type = TokenType::tt_return, .value = buf });
-          continue;
         }
         else if (buf == ";") {
           std::cout << "got semicolon\n" << std::endl;
           tokens.push_back({ .type = TokenType::tt_semi, .value = buf });
-          buf.clear();
-          continue;
         }
-        else if (std::isspace(peek().has_value())) {
-          continue;
+        if (std::isspace(peek().has_value())) {
+          std::cout << "got space\n";
         }
-        else {
-          std::cerr << "Error" << std::endl;
-          exit(EXIT_FAILURE);
+        buf.clear();
+      }
+      else if (std::isdigit(peek().value())) {
+        buf.push_back(consume());
+        while (peek().has_value() && std::isdigit(peek().value())) {
+          buf.push_back(consume());
         }
+        tokens.push_back({ .type = TokenType::tt_int, .value = buf});
+        std::cout << "Got Int: " << buf << std::endl;
+        buf.clear();
       }
     }
 
