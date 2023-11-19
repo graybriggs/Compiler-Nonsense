@@ -5,9 +5,8 @@
 
 #include "token.h"
 
-void dbg_tokens(std::vector<Token>& tok) {
 
-  for (auto t : tok) {
-    std::cout << token_name(t.type) << std::endl;
-  }
-}
+#define DBG_PRINT(msg) std::cout << msg << "\n"; 
+
+
+void dbg_tokens(std::vector<Token>& tok);
