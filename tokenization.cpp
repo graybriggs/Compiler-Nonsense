@@ -2,11 +2,9 @@
 #include <cctype>
 #include <iostream>
 
+#include "debug.h"
 #include "token.h"
 #include "tokenization.h"
-
-
-#define DBG_PRINT(msg) std::cout << msg << "\n"; 
 
 Tokenizer::Tokenizer(std::string str):
     m_src(std::move(str))
@@ -18,7 +16,7 @@ std::vector<Token> Tokenizer::tokenize() {
   std::string buf;
   int val = 0;
   while (peek().has_value()) {
-    if (std::isalpha(peek().value()) || peek().value() == ' ' || peek().value() == ';') {
+    if (std::isalpha(peek().value()) || peek().value() == ';') {
       buf.push_back(consume());
       while (peek().has_value() && std::isalnum(peek().value())) {
         buf.push_back(consume());
@@ -28,27 +26,22 @@ std::vector<Token> Tokenizer::tokenize() {
         DBG_PRINT("got exit")
         tokens.push_back({ .type = TokenType::tt_exit, .value = buf });
         buf.clear();
-        continue;
       }
       else if (buf == "return") {
         DBG_PRINT("got return")
         tokens.push_back({ .type = TokenType::tt_return, .value = buf });
         buf.clear();
-        continue;
       }
       else if (buf == ";") {
         DBG_PRINT("got semi")
         tokens.push_back({ .type = TokenType::tt_semi, .value = buf });
         buf.clear();
-        continue;
       }
-      else if (std::isspace(peek().has_value())) {
+    }
+    else if (std::isspace(peek().has_value())) {
         DBG_PRINT("got space")
         consume();
         buf.clear();
-        continue;
-      }
-      buf.clear();
     }
     else if (std::isdigit(peek().value())) {
       buf.push_back(consume());
@@ -59,6 +52,10 @@ std::vector<Token> Tokenizer::tokenize() {
       std::cout << "Got Int: " << buf << std::endl;
       buf.clear();
       continue;
+    }
+    else {
+      DBG_PRINT("Unexpected.");
+      exit(1); 
     }
   }
   return tokens;
