@@ -7,7 +7,8 @@
 #include "tokenization.h"
 
 Tokenizer::Tokenizer(std::string str):
-    m_src(std::move(str))
+    m_src(std::move(str)),
+    m_index(0)
     {}
 
 std::vector<Token> Tokenizer::tokenize() {
@@ -38,11 +39,12 @@ std::vector<Token> Tokenizer::tokenize() {
         buf.clear();
       }
     }
-    else if (std::isspace(peek().has_value())) {
-        DBG_PRINT("got space")
+    
+    else if (std::isspace(peek().value())) {
         consume();
         buf.clear();
     }
+    
     else if (std::isdigit(peek().value())) {
       buf.push_back(consume());
       while (peek().has_value() && std::isdigit(peek().value())) {
@@ -53,6 +55,7 @@ std::vector<Token> Tokenizer::tokenize() {
       buf.clear();
       continue;
     }
+    
     else {
       DBG_PRINT("Unexpected.");
       exit(1); 
@@ -67,13 +70,14 @@ std::optional<char> Tokenizer::peek(int ahead) const {
     return {};
   }
   else {
+    //DBG_PRINT(m_src.at(m_index))
     return m_src.at(m_index);
   }
 }
 
 char Tokenizer::consume() {
   char c = m_src.at(m_index);
-  std::cout << c << "\n";
+  //std::cout << c << "\n";
   ++m_index;
   return c;
 }
