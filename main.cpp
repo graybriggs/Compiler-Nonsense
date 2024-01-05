@@ -5,10 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-
 #include "debug.h"
+#include "token.h"
 #include "tokenization.h"
 
 int main(int argc, char* argv[]) {
@@ -26,9 +24,9 @@ int main(int argc, char* argv[]) {
     contents = ss.str();
   }
 
-  Tokenizer tokenizer(std::move(contents));
-  std::vector<Token> tok = tokenizer.tokenize();
-  
+  Tokenizer t(std::move(contents));
+  std::vector<Token> tok = t.tokenize();
+
   dbg_tokens(tok);
 
   //std::cout << contents << "\n";
